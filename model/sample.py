@@ -55,7 +55,7 @@ def greed_search(n_sampled,path):
 
 
 
-def main_bo(n_sampled=500,iterations=5,random_seed=1,path):
+def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
     
 
     relation = RELATION()
