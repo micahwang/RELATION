@@ -12,7 +12,7 @@ This repository contains the source of RELATION, a software for DL-based de novo
 - pytorch >= 1.1.0
 - openbabel == 2.4.1
 - RDKit
-- pyscreener
+- pyscreener [README](https://github.com/coleygroup/pyscreener)
 
 if utilizing GPU accelerated model training 
 - CUDA & cudnn 
