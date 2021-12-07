@@ -6,7 +6,6 @@ import rdkit
 from rdkit import Chem
 import os
 import pybel
-from grid import Featurizer, make_grid
 import tqdm
 
 
