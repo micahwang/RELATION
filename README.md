@@ -44,7 +44,7 @@ Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and ty
 
 `sample.greedy_search(n_sampled=1000, path='./gen_smi.csv')`
 
-or you can also use the bayesian optimization sampling process:
+or you can also use the bayesian optimization in sampling process:
 
 `main_bo(n_sampled=500,iterations=5,random_seed=1, path='./')`
 
