@@ -55,7 +55,7 @@ def greed_search(n_sampled,path):
 
 
 
-def main_bo(n_sampled=500,iterations=5,random_seed=1):
+def main_bo(n_sampled=500,iterations=5,random_seed=1,path):
     
 
     relation = RELATION()
@@ -119,8 +119,8 @@ def main_bo(n_sampled=500,iterations=5,random_seed=1):
         new_latentpoint = next_inputs
         new_latentpoint = np.vstack(new_latentpoint) 
         
-        save_object(gen_smi, './output' + "/scores{}.dat".format(iteration))
-        save_object(scores, './output' + "/next_inputs{}.dat".format(iteration))       
+        save_object(gen_smi, path + "/scores{}.dat".format(iteration))
+        save_object(scores, path + "/next_inputs{}.dat".format(iteration))       
       
         X_train = np.concatenate([X_train, new_latentpoint], 0)
         y_train = np.concatenate([y_train, np.array(scores)[:, None]], 0)
