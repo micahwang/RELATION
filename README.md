@@ -46,6 +46,6 @@ Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and ty
 
 or you can also use the bayesian optimization sampling process:
 
-`main_bo(n_sampled=500,iterations=5,random_seed=1, path='./gen_smi.csv')`
+`main_bo(n_sampled=500,iterations=5,random_seed=1, path='./')`
 
 
