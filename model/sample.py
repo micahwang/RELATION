@@ -119,8 +119,8 @@ def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
         new_latentpoint = next_inputs
         new_latentpoint = np.vstack(new_latentpoint) 
         
-        save_object(gen_smi, path + "/scores{}.dat".format(iteration))
-        save_object(scores, path + "/next_inputs{}.dat".format(iteration))       
+        save_object(gen_smi, path + "/gen{}.dat".format(iteration))
+  
       
         X_train = np.concatenate([X_train, new_latentpoint], 0)
         y_train = np.concatenate([y_train, np.array(scores)[:, None]], 0)
