@@ -31,7 +31,7 @@ def decode_smiles(tok):
 
 def docking(smi):
     metadata = ps.build_metadata("vina")
-    docking = ps.virtual_screen("vina", [".data/docking/4gv1_pre.pdb"], (-18.2, 14.4, -16.1), (15.4, 13.9, 14.5), metadata, ncpu=24) {...}
+    docking = ps.virtual_screen("vina", [".data/docking/4gv1_pre.pdb"], (-20.01, 4.34, 10.74), (10, 10, 10), metadata, ncpu=24) 
     scores = docking(smi)
     return scores
 
