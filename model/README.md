@@ -1,1 +1,1 @@
-The `sparse_gp_theano_internal.py`, `gauss.py` and `sparse_gp.py` was was cited from [README] (https://github.com/Bibyutatsu/FastJTNNpy3) and [README](https://github.com/Ryan-Rhys/Constrained-Bayesian-Optimisation-for-Automatic-Chemical-Design.)
+The `sparse_gp_theano_internal.py`, `gauss.py` and `sparse_gp.py` scripts were cited from [README](https://github.com/Bibyutatsu/FastJTNNpy3) and [README](https://github.com/Ryan-Rhys/Constrained-Bayesian-Optimisation-for-Automatic-Chemical-Design.)
