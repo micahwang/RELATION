@@ -8,12 +8,12 @@ This repository contains the source of RELATION, a software for DL-based de novo
 
 
 ## Requirements
-- Python >= 3.7
+- Python == 3.7
 - pytorch >= 1.1.0
 - openbabel == 2.4.1
-- RDKit
+- RDKit == 2020.09.5
+- theano == 1.0.5
 - pyscreener [README](https://github.com/coleygroup/pyscreener)
-
 if utilizing GPU accelerated model training 
 - CUDA==10.2 & cudnn==7.5 
 
@@ -26,19 +26,20 @@ if utilizing GPU accelerated model training
 ## Running RELATION
 
 ### Prepare molecular dataset
-To train the RELATION network, the source dataset and target dataset (akt1 and cdk2) must by converted to a 4D-tensor-(19,16,16,16), which means the 3D gird with 19 channels(np array in `./data/zinc/zinc.npz`,`./data/akt1/akt_pkis.npz`,`./data/cdk2/cdk2_pkis.npz`).
+To train the RELATION network, the source dataset and target dataset (akt1 and cdk2) must by converted to a 4D-tensor-(19,16,16,16), which means the 3D gird with 19 channels.
 #### Source dataset
  `python model/data_prepare.py --input ./data/zinc/zinc.csv 
                                --output ./data/zinc/zinc.npz 
                                --mode 0 `
                             
-####  target dataset
+####  Target dataset
  `python model/data_prepare.py --input ./data/akt1 
                                --output ./data/akt1/akt_pkis.npz
                                --pkidir ./data/akt1.csv
                                --mode 1`
 
 ### Training RELATION
+Load sourch dataset (`./data/zinc/zinc.npz`) and target dataset (`./data/akt1/akt_pkis.npz`or `./data/cdk2/cdk2_pkis.npz`).
 
 `python model/training.py`
 
@@ -49,13 +50,18 @@ To train the RELATION network, the source dataset and target dataset (akt1 and c
 
 Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and typing the following codes on any python interpreter   in `/model` directory:
 
-`import sample`  
 
 
-`sample.greedy_search(n_sampled=1000, path='./gen_smi.csv')`
+`python sample.py --num 500
+                  --output ./gen_smi.csv`
 
 or you can also use the bayesian optimization in sampling process:
 
-`main_bo(n_sampled=500,iterations=5,random_seed=1, path='./gen_smi.csv')`
+`python sample.py --num 500
+                  --output ./gen_smi.csv
+                  --method bo
+                  --iter 5`
+
+
 
 
