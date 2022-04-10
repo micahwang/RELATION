@@ -7,7 +7,7 @@ from rdkit import Chem
 import os
 import pybel
 import tqdm
-
+import argparse
 
 class Featurizer():
     """
@@ -429,19 +429,19 @@ def get_3d_grid(input,output,pki_path,mode):
     Generate the 3d grid of nparray format of
      source data (zinc) and target data (binding complexes)
 
-    mode: 1 for source data; 0 for target data 
+    mode: 1 for target data; 0 for source data 
 
     input: in mode 1, means the the FODER path of pdb complexes(./pdb); 
            in mode 0, means the FILES path of smiles (./zinc.csv)
 
     output: save path of training data (./source.npz)
 
-    pki_path:  the FILES path of pkis (./pdb/pkis.csv)      
+    pki_path:  the FILES path of pkis (./data/pkis.csv)      
 '''
 
     charge_column = featurizer.FEATURE_NAMES.index('partialcharge')
     grid_in = []
-    if mode == 0:   
+    if mode == 1:   
         for root, _, files in os.walk(input):
             for IDs in files:
                 pdb_path = pdb_data.append(os.path.join(root, IDs))
@@ -468,52 +468,14 @@ def get_3d_grid(input,output,pki_path,mode):
             labels=smi_emb(input)
             np.savez_compressed(output, dataset=grid_in, smi=labels)
 
-            
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", type=str, required=True, 
+    help='input: in mode 1, means the the FODER path of pdb complexes(./pdb); \
+        in mode 0, means the FILES path of smiles (./zinc.csv)')
+    parser.add_argument("-o","--output", type=str, required=True,help='output directory')
+    parser.add_argument("-p","--pkidir", type=str, required=True,help='the path of pkis')
+    parser.add_argument("-m","--mode", type=str, required=True,help='mode: 0 for source data; 1 for target data')
+    args = parser.parse_args()
+    get_3d_grid(input=args.input,output=args.output,pki_path=args.pkidir,mode=args.mode)
