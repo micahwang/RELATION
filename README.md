@@ -19,7 +19,7 @@ if utilizing GPU accelerated model training
 
 ### Creat a new environment in conda 
 
-conda env create -f env.yml
+ `conda env create -f env.yml `
 
 
 
