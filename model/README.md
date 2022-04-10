@@ -1,1 +1,1 @@
-`sparse_gp_theano_internal.py`, `gauss.py` and `sparse_gp.py` [README](https://github.com/coleygroup/pyscreener)
+The `sparse_gp_theano_internal.py`, `gauss.py` and `sparse_gp.py` was was cited from [README] (https://github.com/Bibyutatsu/FastJTNNpy3) and [README](https://github.com/Ryan-Rhys/Constrained-Bayesian-Optimisation-for-Automatic-Chemical-Design.)
