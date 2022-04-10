@@ -14,6 +14,7 @@ This repository contains the source of RELATION, a software for DL-based de novo
 - RDKit == 2020.09.5
 - theano == 1.0.5
 - pyscreener [README](https://github.com/coleygroup/pyscreener)
+
 if utilizing GPU accelerated model training 
 - CUDA==10.2 & cudnn==7.5 
 
