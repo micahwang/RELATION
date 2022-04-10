@@ -475,7 +475,7 @@ if __name__ == "__main__":
     help='input: in mode 1, means the the FODER path of pdb complexes(./pdb); \
         in mode 0, means the FILES path of smiles (./zinc.csv)')
     parser.add_argument("-o","--output", type=str, required=True,help='output directory')
-    parser.add_argument("-p","--pkidir", type=str, required=True,help='the path of pkis')
+    parser.add_argument("-p","--pkidir", type=str, required=False,help='the path of pkis')
     parser.add_argument("-m","--mode", type=str, required=True,help='mode: 0 for source data; 1 for target data')
     args = parser.parse_args()
     get_3d_grid(input=args.input,output=args.output,pki_path=args.pkidir,mode=args.mode)
