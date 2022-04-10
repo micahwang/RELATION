@@ -9,6 +9,7 @@ import tqdm
 import sparse_gp as SparseGP
 from utils import save_object
 import pyscreener as ps
+import argparse
 
 voc_set=['pad', 'bos', 'eos', '5', 'Y', ')', 'Z', '[', ']', '-', 
     'S', '1', 'O', 'N', "'", ' ', 'C', '(', 'n', 'c', '#', 's', '6', 
@@ -131,10 +132,18 @@ def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
         iteration += 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--num", type=int, required=True)
+    parser.add_argument("-o","--output", type=str, required=True,help='output directory')
+    parser.add_argument("-i","--iter", type=int, required=False,help='the path of pkis')
+    parser.add_argument("-m","--method", type=str, required=False,help='mode: 1 for source data; 0 for target data')
+    args = parser.parse_args()
+    #get_3d_grid(input=args.input,output=args.output,pki_path=args.pkidir,mode=args.mode)
 
-    main_bo(n_sampled=500,iterations=5)
 
-
-
-
+    if args.method == 'bo':
+        main_bo(n_sampled=args.num,iterations=args.iter,random_seed=1, path=args.output)
+    else:
+        greed_search(n_sampled=args.num, path=args.output)
+    
