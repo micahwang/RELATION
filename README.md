@@ -48,8 +48,7 @@ Load sourch dataset (`./data/zinc/zinc.npz`) and target dataset (`./data/akt1/ak
 
 ### Sampling
 
-Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and typing the following codes on any python interpreter   in `/model` directory:
-
+Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and typing the following codes:
 
 
 `python sample.py --num 500
