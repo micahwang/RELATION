@@ -26,10 +26,17 @@ if utilizing GPU accelerated model training
 ## Running RELATION
 
 ### Prepare molecular dataset
-To train the RELATION network, the source dataset (`./data/zinc/zinc.csv`) and target dataset (`./data/akt1`, `./data/cdk2`) must by converted to a 4D-tensor-(19,16,16,16), which means the 3D gird with 19 channels(np array in `./data/zinc/zinc.npz`,`./data/akt1/akt_pkis.npz`,`./data/cdk2/akt_pkis.npz`).
- 
- `python model/data_prepare.py`
-
+To train the RELATION network, the source dataset and target dataset (akt1 and cdk2) must by converted to a 4D-tensor-(19,16,16,16), which means the 3D gird with 19 channels(np array in `./data/zinc/zinc.npz`,`./data/akt1/akt_pkis.npz`,`./data/cdk2/cdk2_pkis.npz`).
+#### Source dataset
+ `python model/data_prepare.py --input ./data/zinc/zinc.csv 
+                               --output ./data/zinc/zinc.npz 
+                               --mode 0 `
+                            
+####  target dataset
+ `python model/data_prepare.py --input ./data/akt1 
+                               --output ./data/akt1/akt_pkis.npz
+                               --pkidir ./data/akt1.csv
+                               --mode 1`
 
 ### Training RELATION
 
