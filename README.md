@@ -15,12 +15,15 @@ This repository contains the source of RELATION, a software for DL-based de novo
 - pyscreener [README](https://github.com/coleygroup/pyscreener)
 
 if utilizing GPU accelerated model training 
-- CUDA & cudnn 
+- CUDA==10.2 & cudnn==7.5 
+
+### Creat a new environment in conda 
+
+conda env create -f env.yml
 
 
 
-
-## Running MolPAL
+## Running RELATION
 
 ### Prepare molecular dataset
 To train the RELATION network, the source dataset (`./data/zinc/zinc.csv`) and target dataset (`./data/akt1`, `./data/cdk2`) must by converted to a 4D-tensor-(19,16,16,16), which means the 3D gird with 19 channels(np array in `./data/zinc/zinc.npz`,`./data/akt1/akt_pkis.npz`,`./data/cdk2/akt_pkis.npz`).
