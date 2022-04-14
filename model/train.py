@@ -31,12 +31,12 @@ active_domain_loss_step = 10000
 savedir='./output/'
 
 #####################################################################################################
-# the α，β，γ weight of the dofferent relation loss parts，
+# the α，β，γ weight of the different relation loss parts，
 ###########################################################
 alpha_weight = 0.01
 beta_weight = 0.075
 gamma_weight = 0.25
-
+i
 
 
 log_file = open(os.path.join(savedir, "log.txt"), "w")
