@@ -4,7 +4,6 @@ from model import RELATION
 import pandas as pd
 import rdkit
 from rdkit import Chem
-from utils import autodock
 import tqdm
 import sparse_gp as SparseGP
 from utils import save_object
