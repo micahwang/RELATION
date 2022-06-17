@@ -42,7 +42,7 @@ To train the RELATION network, the source dataset and target dataset (akt1 and c
 ### Training RELATION
 Load sourch dataset (`./data/zinc/zinc.npz`) and target dataset (`./data/akt1/akt_pkis.npz`or `./data/cdk2/cdk2_pkis.npz`).
 
-`python model/training.py`
+`python model/train.py`
 
 
 
