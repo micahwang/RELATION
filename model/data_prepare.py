@@ -472,7 +472,7 @@ def get_3d_grid(input,output,pki_path,mode):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", type=str, required=True, 
-    help='input: in mode 1, means the the FODER path of pdb complexes(./pdb); \
+    help='input: in mode 1, means the the FODER path of pdb complexes(./pdb),in RELATION/data/akt1&cdk2/.maegz ],all pdb files need to be unpacked to release; \
         in mode 0, means the FILES path of smiles (./zinc.csv)')
     parser.add_argument("-o","--output", type=str, required=True,help='output directory')
     parser.add_argument("-p","--pkidir", type=str, required=False,help='the path of pkis')
