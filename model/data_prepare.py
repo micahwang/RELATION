@@ -250,35 +250,35 @@ def rotation_matrix(axis, theta):
                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
 
 
-# Create matrices for all possible 90* rotations of a box
-ROTATIONS = [rotation_matrix([1, 1, 1], 0)]
+    # Create matrices for all possible 90* rotations of a box
+    ROTATIONS = [rotation_matrix([1, 1, 1], 0)]
 
-# about X, Y and Z - 9 rotations
-for a1 in range(3):
-    for t in range(1, 4):
-        axis = np.zeros(3)
-        axis[a1] = 1
-        theta = t * pi / 2.0
-        ROTATIONS.append(rotation_matrix(axis, theta))
-
-# about each face diagonal - 6 rotations
-for (a1, a2) in combinations(range(3), 2):
-    axis = np.zeros(3)
-    axis[[a1, a2]] = 1.0
-    theta = pi
-    ROTATIONS.append(rotation_matrix(axis, theta))
-    axis[a2] = -1.0
-    ROTATIONS.append(rotation_matrix(axis, theta))
-
-# about each space diagonal - 8 rotations
-for t in [1, 2]:
-    theta = t * 2 * pi / 3
-    axis = np.ones(3)
-    ROTATIONS.append(rotation_matrix(axis, theta))
+    # about X, Y and Z - 9 rotations
     for a1 in range(3):
-        axis = np.ones(3)
-        axis[a1] = -1
+        for t in range(1, 4):
+            axis = np.zeros(3)
+            axis[a1] = 1
+            theta = t * pi / 2.0
+            ROTATIONS.append(rotation_matrix(axis, theta))
+
+    # about each face diagonal - 6 rotations
+    for (a1, a2) in combinations(range(3), 2):
+        axis = np.zeros(3)
+        axis[[a1, a2]] = 1.0
+        theta = pi
         ROTATIONS.append(rotation_matrix(axis, theta))
+        axis[a2] = -1.0
+        ROTATIONS.append(rotation_matrix(axis, theta))
+
+    # about each space diagonal - 8 rotations
+    for t in [1, 2]:
+        theta = t * 2 * pi / 3
+        axis = np.ones(3)
+        ROTATIONS.append(rotation_matrix(axis, theta))
+        for a1 in range(3):
+            axis = np.ones(3)
+            axis[a1] = -1
+            ROTATIONS.append(rotation_matrix(axis, theta))
 
 
 def rotate(coords, rotation):
