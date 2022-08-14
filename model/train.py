@@ -11,7 +11,7 @@ from torch.autograd import Variable
 from model import RELATION
 from functions import LatentLoss, DiffLoss, SimLoss
 from torch.nn.utils.rnn import pack_padded_sequence
-import tqdm
+from tqdm import tqdm
 
 
 
@@ -137,7 +137,7 @@ current_step = 0
 #RELATION network tarinng#
 ##########################
 
-for epoch in range(n_epoch):
+for epoch in tqdm(range(n_epoch)):
     
 
     i = 0
