@@ -1,7 +1,7 @@
+import math
 import numpy as np
 import pandas as pd
 import re
-import numpy as np
 import rdkit
 from rdkit import Chem
 import os
@@ -351,7 +351,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
     max_dist = float(max_dist)
     grid_resolution = float(grid_resolution)
 
-    box_size = ceil(2 * max_dist / grid_resolution + 1)
+    box_size = math.ceil(2 * max_dist / grid_resolution + 1)
 
     # move all atoms to the neares grid point
     grid_coords = (coords + max_dist) / grid_resolution
