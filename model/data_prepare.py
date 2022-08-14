@@ -6,7 +6,7 @@ import rdkit
 from rdkit import Chem
 import os
 import pybel
-import tqdm
+from tqdm import tqdm
 import argparse
 
 class Featurizer():
@@ -456,7 +456,7 @@ def get_3d_grid(input,output,pki_path,mode):
          
     else:
             mol_data = pd.read_csv(input)
-            for i in mol_data['SMILES']:
+            for i in tqdm(mol_data['SMILES']):
                 i=pybel.readstring('smi',i)
                 crds, fea= featurizer.get_featurures(i,1.0)
                 x=make_grid(crds, fea)
