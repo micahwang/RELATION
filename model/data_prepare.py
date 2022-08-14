@@ -240,9 +240,9 @@ def rotation_matrix(axis, theta):
     if not isinstance(theta, (float, int)):
         raise TypeError('theta must be a float')
 
-    axis = axis / sqrt(np.dot(axis, axis))
-    a = cos(theta / 2.0)
-    b, c, d = -axis * sin(theta / 2.0)
+    axis = axis / np.sqrt(np.dot(axis, axis))
+    a = np.cos(theta / 2.0)
+    b, c, d = -axis * np.sin(theta / 2.0)
     aa, bb, cc, dd = a * a, b * b, c * c, d * d
     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
     return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
@@ -351,7 +351,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
     max_dist = float(max_dist)
     grid_resolution = float(grid_resolution)
 
-    box_size = ceil(2 * max_dist / grid_resolution + 1)
+    box_size = np.ceil(2 * max_dist / grid_resolution + 1)
 
     # move all atoms to the neares grid point
     grid_coords = (coords + max_dist) / grid_resolution
