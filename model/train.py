@@ -38,7 +38,7 @@ Path(savedir).mkdir(exist_ok=True)
 alpha_weight = 0.01
 beta_weight = 0.075
 gamma_weight = 0.25
-i
+# i
 
 
 log_file = open(os.path.join(savedir, "log.txt"), "w")
