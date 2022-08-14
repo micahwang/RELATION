@@ -1,5 +1,6 @@
 
 import os
+from pathlib import Path
 import torch
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
@@ -29,6 +30,7 @@ step_decay_weight = 0.95
 lr_decay_step = 20000
 active_domain_loss_step = 10000
 savedir='./output/'
+Path(savedir).mkdir(exist_ok=True)
 
 #####################################################################################################
 # the α，β，γ weight of the different relation loss parts，
