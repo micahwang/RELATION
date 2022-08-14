@@ -24,7 +24,7 @@ class Featurizer():
                  custom_properties=None, smarts_properties=None,
                  smarts_labels=None):
 
-        # Remember namse of all features in the correct order
+        # Remember names of all features in the correct order
         self.FEATURE_NAMES = []
 
         if atom_codes is not None:
