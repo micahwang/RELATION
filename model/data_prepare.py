@@ -1,4 +1,4 @@
-import math
+
 import numpy as np
 import pandas as pd
 import re
@@ -351,7 +351,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
     max_dist = float(max_dist)
     grid_resolution = float(grid_resolution)
 
-    box_size = math.ceil(2 * max_dist / grid_resolution + 1)
+    box_size = ceil(2 * max_dist / grid_resolution + 1)
 
     # move all atoms to the neares grid point
     grid_coords = (coords + max_dist) / grid_resolution
@@ -458,7 +458,7 @@ def get_3d_grid(input,output,pki_path,mode):
             mol_data = pd.read_csv(input)
             for i in mol_data['SMILES']:
                 i=pybel.readstring('smi',i)
-                crd, fea= featurizer.get_featurizers(i,1.0)
+                crd, fea= featurizer.get_featurures(i,1.0)
                 x=make_grid(crds, fea)
                 x = np.vstack(x)
                 x[..., charge_column] /= 0.425
