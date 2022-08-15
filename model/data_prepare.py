@@ -1,12 +1,12 @@
+import math
 import numpy as np
 import pandas as pd
 import re
-import numpy as np
 import rdkit
 from rdkit import Chem
 import os
 import pybel
-import tqdm
+from tqdm import tqdm
 import argparse
 
 class Featurizer():
@@ -24,7 +24,7 @@ class Featurizer():
                  custom_properties=None, smarts_properties=None,
                  smarts_labels=None):
 
-        # Remember namse of all features in the correct order
+        # Remember names of all features in the correct order
         self.FEATURE_NAMES = []
 
         if atom_codes is not None:
@@ -230,7 +230,7 @@ def rotation_matrix(axis, theta):
     if not isinstance(axis, (np.ndarray, list, tuple)):
         raise TypeError('axis must be an array of floats of shape (3,)')
     try:
-        axis = np.asarray(axis, dtype=np.float)
+        axis = np.asarray(axis, dtype=np.float32)
     except ValueError:
         raise ValueError('axis must be an array of floats of shape (3,)')
 
@@ -240,9 +240,9 @@ def rotation_matrix(axis, theta):
     if not isinstance(theta, (float, int)):
         raise TypeError('theta must be a float')
 
-    axis = axis / sqrt(np.dot(axis, axis))
-    a = cos(theta / 2.0)
-    b, c, d = -axis * sin(theta / 2.0)
+    axis = axis / np.sqrt(np.dot(axis, axis))
+    a = np.cos(theta / 2.0)
+    b, c, d = -axis * np.sin(theta / 2.0)
     aa, bb, cc, dd = a * a, b * b, c * c, d * d
     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
     return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
@@ -290,7 +290,7 @@ def rotate(coords, rotation):
     if not isinstance(coords, (np.ndarray, list, tuple)):
         raise TypeError('coords must be an array of floats of shape (N, 3)')
     try:
-        coords = np.asarray(coords, dtype=np.float)
+        coords = np.asarray(coords, dtype=np.float32)
     except ValueError:
         raise ValueError('coords must be an array of floats of shape (N, 3)')
     shape = coords.shape
@@ -321,7 +321,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
     """
 
     try:
-        coords = np.asarray(coords, dtype=np.float)
+        coords = np.asarray(coords, dtype=np.float32)
     except ValueError:
         raise ValueError('coords must be an array of floats of shape (N, 3)')
     c_shape = coords.shape
@@ -330,7 +330,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
 
     N = len(coords)
     try:
-        features = np.asarray(features, dtype=np.float)
+        features = np.asarray(features, dtype=np.float32)
     except ValueError:
         raise ValueError('features must be an array of floats of shape (N, F)')
     f_shape = features.shape
@@ -351,7 +351,7 @@ def make_grid(coords, features, grid_resolution=1.0, max_dist=7.5):
     max_dist = float(max_dist)
     grid_resolution = float(grid_resolution)
 
-    box_size = ceil(2 * max_dist / grid_resolution + 1)
+    box_size = math.ceil(2 * max_dist / grid_resolution + 1)
 
     # move all atoms to the neares grid point
     grid_coords = (coords + max_dist) / grid_resolution
@@ -456,9 +456,9 @@ def get_3d_grid(input,output,pki_path,mode):
          
     else:
             mol_data = pd.read_csv(input)
-            for i in mol_data['SMILES']:
+            for i in tqdm(mol_data['SMILES']):
                 i=pybel.readstring('smi',i)
-                crd, fea= featurizer.get_featurizers(i,1.0)
+                crds, fea= featurizer.get_features(i,1.0)
                 x=make_grid(crds, fea)
                 x = np.vstack(x)
                 x[..., charge_column] /= 0.425

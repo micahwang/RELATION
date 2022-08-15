@@ -1,5 +1,6 @@
 
 import os
+from pathlib import Path
 import torch
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
@@ -10,7 +11,7 @@ from torch.autograd import Variable
 from model import RELATION
 from functions import LatentLoss, DiffLoss, SimLoss
 from torch.nn.utils.rnn import pack_padded_sequence
-import tqdm
+from tqdm import tqdm
 
 
 
@@ -29,6 +30,7 @@ step_decay_weight = 0.95
 lr_decay_step = 20000
 active_domain_loss_step = 10000
 savedir='./output/'
+Path(savedir).mkdir(exist_ok=True)
 
 #####################################################################################################
 # the α，β，γ weight of the different relation loss parts，
@@ -36,7 +38,7 @@ savedir='./output/'
 alpha_weight = 0.01
 beta_weight = 0.075
 gamma_weight = 0.25
-i
+# i
 
 
 log_file = open(os.path.join(savedir, "log.txt"), "w")
@@ -135,7 +137,7 @@ current_step = 0
 #RELATION network tarinng#
 ##########################
 
-for epoch in range(n_epoch):
+for epoch in tqdm(range(n_epoch)):
     
 
     i = 0
