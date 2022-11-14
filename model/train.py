@@ -1,5 +1,6 @@
 
 import os
+from tkinter import S
 import torch
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
@@ -10,42 +11,50 @@ from torch.autograd import Variable
 from model import RELATION
 from functions import LatentLoss, DiffLoss, SimLoss
 from torch.nn.utils.rnn import pack_padded_sequence
-import tqdm
+from tqdm import tqdm
+import torch.nn.functional as F
+
+import argparse
 
 
+parser = argparse.ArgumentParser(description="Training parameters")
+parser.add_argument('-e', '--epoches', type=int, default=150)
+parser.add_argument('-s', '--steps', type=int, default=5000)
+parser.add_argument('-t', '--target', type=str, default='cdk2')
+parser.add_argument('-b', '--batchsize', type=int, default=256)
+parser.add_argument('-d', '--device', type=str, default='0')
+args = parser.parse_args()
 
+os.environ['CUDA_VISIBLE_DEVICES']=args.device
 
 model_root = 'relation'
 cuda = True
 cudnn.benchmark = True
 
 #######################################
-# params of relation model            
+# params of relation model            #
 #######################################
 
-lr = 1e-2
-n_epoch = 150
+lr = 1e-4
 step_decay_weight = 0.95
 lr_decay_step = 20000
-active_domain_loss_step = 10000
 savedir='./output/'
 
-#####################################################################################################
-# the α，β，γ weight of the different relation loss parts，
 ###########################################################
-alpha_weight = 0.01
+# the α，β，γ weight of the dofferent relation loss parts，#
+###########################################################
+
+alpha_weight = 1
 beta_weight = 0.075
-gamma_weight = 0.25
-i
+gamma_weight = 0.05
 
 
-log_file = open(os.path.join(savedir, "log.txt"), "w")
 
-###################################################################################################
-#    Implement the dataloader for source and target dataset.                                              
-#      This is used to train the relation captioning model.    
-#                                            
-###################################################################################################
+###################################################
+# load the 3D-grid format of                      #
+# source (ligand-only) and                        #
+# target data(ligand-protein complexes)           #
+###################################################
 
 class relation_dataset(data.Dataset):
     def __init__(self,path):
@@ -58,9 +67,7 @@ class relation_dataset(data.Dataset):
             x = i.index(2)
             self.smi_length.append(x)
 
-#####################################################################
-#The 3 special tokens: grid, caption and length 
-####################################################################
+
 
     def __getitem__(self,index):
         grid = self.representation[index]
@@ -73,14 +80,15 @@ class relation_dataset(data.Dataset):
     def __len__(self):
         return len(self.captions)
 
+target_dataset=relation_dataset('/home/mingyang/debug/RELATION/grid/%s_pkis.npz' %(args.target))
+#source_dataset=relation_dataset('/home/mingyang/debug/RELATION/grid/%s_pkis.npz' %(args.target))
+source_dataset=relation_dataset('/home/mingyang/debug/RELATION/grid/zinc/zinc_900000-1000000.npz')
 
-source_dataset=relation_dataset('data/zinc/zinc.npz')
-target_dataset=relation_dataset('data/akt1/akt_pkis.npz')
 
 
 
-dataloader_source = torch.utils.data.DataLoader(dataset=source_dataset,batch_size=32,shuffle=True)
-dataloader_target = torch.utils.data.DataLoader(dataset=target_dataset,batch_size=32,shuffle=True)
+dataloader_source = torch.utils.data.DataLoader(dataset=source_dataset,batch_size=args.batchsize,shuffle=True)
+dataloader_target = torch.utils.data.DataLoader(dataset=target_dataset,batch_size=args.batchsize,shuffle=True)
 
 
 
@@ -128,57 +136,70 @@ for p in relation.parameters():
     p.requires_grad = True
 
 current_step = 0
-
+log_file = open(os.path.join(savedir, "log.txt"), "w")
 
 
 ##########################
 #RELATION network tarinng#
 ##########################
 
-for epoch in range(n_epoch):
+for epoch in tqdm(range(args.epoches)):
     
 
-    i = 0
+    s = 0
 
-    while i < 30000:
+
+
+    while s < args.steps:
 
         ###################################
         # target data training            #
-        ###################################
+            ###################################
         data_source_iter = iter(dataloader_source)
         data_target_iter = iter(dataloader_target)
 
         data_target = data_target_iter.__next__()
-    
+
         relation.zero_grad()
+        
         loss = 0
-
-
         
 
 
         data_target_grid, data_target_caption, data_target_length = data_target
         data_target_caption=data_target_caption.long()
+        data_target_caption_input=[]
+        for i in data_target_caption:
+            i = i.numpy()
+            index = np.argwhere(i==2)
+            i=i[1:int(index[0])]
+            i=torch.from_numpy(i)
+            data_target_caption_input.append(i)
+
+
+
 
         if cuda:
             data_target_grid = data_target_grid.cuda()
             data_target_caption = data_target_caption.cuda()
         
 
-        data_target_grid, data_target_caption  = Variable(data_target_grid), Variable(data_target_caption)
+        data_target_grid, data_target_caption= Variable(data_target_grid), Variable(data_target_caption)
 
 
 
 
-        result = relation(input_data=data_target_grid, mode='target', rec_scheme='all', caption=data_target_caption, lengths=data_target_length)
-        target_mu, target_logvar, target_privte_code, target_share_code, _ = result
+        result = relation(input_data=data_target_grid, input_caption=data_target_caption_input, mode='target', rec_scheme='all', caption=data_target_caption, lengths=data_target_length)
+        
+        _, _, _, target_mu, target_logvar, target_privte_code,_,target_share_code,_ =result
+        
 
-        tar_latloss = loss_latent(target_mu, target_logvar)
+
+        tar_latloss = gamma_weight * loss_latent(target_mu, target_logvar)
         loss += tar_latloss
         tar_diffloss = beta_weight * loss_diff(target_privte_code, target_share_code)
-    
+        loss += tar_diffloss
 
-        optimizer.step()
 
         ###################################
         # source data training            #
@@ -191,46 +212,66 @@ for epoch in range(n_epoch):
 
         data_source_grid, data_source_caption, data_source_length = data_source
         data_source_caption=data_source_caption.long()
+        data_source_caption_input=[]
+        for i in data_source_caption:
+            i = i.numpy()
+            index = np.argwhere(i==2)
+            i=i[1:int(index[0])]
+            i=torch.from_numpy(i)
+            data_source_caption_input.append(i)
 
         if cuda:
             data_source_grid = data_source_grid.cuda()
             data_source_caption = data_source_caption.cuda()
 
-        data_source_grid, data_source_caption  = Variable(data_source_grid), Variable(data_source_caption)
+        data_source_grid, data_source_caption= Variable(data_source_grid), Variable(data_source_caption)
 
-
-        result = relation(input_data=data_source_grid, mode='source', rec_scheme='all', caption=data_source_caption, lengths=data_source_length)
-        source_mu, source_logvar, source_privte_code, source_share_code, source_recon_code = result
+        result = relation(input_data=data_source_grid, input_caption=data_source_caption_input, mode='source', rec_scheme='all', caption=data_source_caption, lengths=data_source_length)
+        _, _, _, source_mu, source_logvar, source_privte_code,_,source_share_code, source_recon_code =result
 
         bi_sim = gamma_weight * loss_similarity(source_share_code, target_share_code)
         loss += bi_sim
 
         source_diff = beta_weight * loss_diff(source_privte_code, source_share_code)
         loss += source_diff
-        targets = pack_padded_sequence(data_source_caption, data_source_length, batch_first=True,enforce_sorted=False)[0]
+        source_latloss = gamma_weight *  loss_latent(source_mu, source_logvar)
+        loss = source_latloss
 
-        source_simse = alpha_weight * loss_caption(source_recon_code, targets)
+
+
+        x = nn.utils.rnn.pad_sequence(data_source_caption_input, batch_first=True,padding_value=0)
+        x=x[:, 1:].contiguous().view(-1)
+        x=x.cuda()
+        y=source_recon_code[:, :-1].contiguous().view(-1, source_recon_code.size(-1))
+
+        source_simse = alpha_weight * F.cross_entropy(
+            y,
+            x,
+            ignore_index=0
+        )
+        
         loss += source_simse
-
+        print(loss)
+        
+        optimizer.zero_grad()
         loss.backward()
         optimizer = exp_lr_scheduler(optimizer=optimizer, step=current_step)
         optimizer.step()
-
-        i += 1
+        s += 1
         current_step += 1
 
-    result = "Step: {}, relation_loss: {:.5f}, ".format(i + 1,float(loss.data.cpu().numpy()) if type(loss) != float else 0.)
-    log_file.write(result + "\n")
+    run_log = "epoch %s, loss: %.5f" %(
+        str(epoch+1),
+        float(loss.data.cpu().numpy())       
+        )
+
+    
+    log_file.write(run_log + "\n")
     log_file.flush()
 
-
-    if epoch % 10 == 0:
-        torch.save(relation.state_dict(),os.path.join(savedir,'relation-akt1-%d.pth' % (i + 1)))
-
-
-
-    print ('step: %d, loss: %f' % (current_step, loss.cpu().data.numpy()))
-    torch.save(relation.state_dict(), os.path.join(savedir,'relation-akt1-%d.pth' % (epoch + 1)))
+    print(run_log)
+    if (epoch+1) % 10 == 0:
+        torch.save(relation.state_dict(),os.path.join(savedir,'rel-%s-%d.pth' % (args.target,epoch+1)))
 
 print ('The job is done ')
 
