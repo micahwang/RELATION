@@ -69,5 +69,7 @@ or you can also use the bayesian optimization in sampling process:
                   --target akt1`
 
 
+Or you can use our online RELATION-based server 
+ `http://cadd.zju.edu.cn/relation/remode/`
 
 
