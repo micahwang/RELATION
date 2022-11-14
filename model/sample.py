@@ -10,6 +10,23 @@ from utils import save_object
 import pyscreener as ps
 import argparse
 
+
+
+parser = argparse.ArgumentParser(description="Training parameters")
+parser.add_argument('-m', '--method', type=int, default=0)
+parser.add_argument('-n', '--numbers', type=int, default=500)
+parser.add_argument('-p', '--path', type=str, default='./output/')
+parser.add_argument('-l', '--max_length', type=int, default=80)
+parser.add_argument('-t', '--target', type=str, default='cdk2')
+parser.add_argument('-d', '--device', type=str, default='0')
+parser.add_argument('-i', '--iter', type=int, default=5)
+
+
+args = parser.parse_args()
+
+
+os.environ['CUDA_VISIBLE_DEVICES']=args.device
+
 voc_set=['pad', 'bos', 'eos', '5', 'Y', ')', 'Z', '[', ']', '-', 
     'S', '1', 'O', 'N', "'", ' ', 'C', '(', 'n', 'c', '#', 's', '6', 
     'X', '4', ',', '2', 'o', 'F', '=', '3', '.', 'I', '/', '+', '\\', '@', 'H', 'P']
@@ -20,42 +37,33 @@ vocab_c2i_v1 = {vocab_i2c_v1[i]: i for i in vocab_i2c_v1}
 def decode_smiles(tok):
     gen_smi = []
     for i in tok:
-        csmile = ""
+        i=i.tolist()
+        print(i)
+        csmile = ''
         for xchar in i[1:]:
-            if xchar == 2:
+            if xchar == 2 or xchar == 0:
                 break
             csmile += vocab_i2c_v1[xchar]
         gen_smi.append(csmile)
     return gen_smi
 
 
-def docking(smi):
-    metadata = ps.build_metadata("vina")
-    docking = ps.virtual_screen("vina", [".data/docking/4gv1_pre.pdb"], (-20.01, 4.34, 10.74), (10, 10, 10), metadata, ncpu=24) 
-    scores = docking(smi)
-    return scores
 
-
-
-def greed_search(n_sampled,path):
+def gen_smi(n_sample,path,max_len,target):
     relation = RELATION()
-    relation.load_state_dict(torch.load('./model.pth'))
+    #relation.load_state_dict(torch.load(os.path.join(path, target+".pth"),map_location=dev))
+    relation.load_state_dict(torch.load('/home/mingyang/debug/RELATION_1/output/rel-'+target+'.pth'))
     relation.to('cuda')
     relation.eval()
+    z_prior = torch.randn(n_sample,512).to('cuda')
+    gen_tok = relation.sample(z_prior,n_sample,max_len,dev='cuda')
+    gen_list=decode_smiles(gen_tok)
+        
+
+    pd.DataFrame({'SMILES':gen_list}).to_csv(os.path.join(path, "gen_smi.csv"),index=0)    
 
 
-    g_smi=[]
-    for i in range(n_sampled):
-        z_prior = torch.randn(1,512).to('cuda')
-        gen_tok = relation.sample(z_prior)
-        gen_smi = decode_smiles(gen_tok)
-        g_smi += gen_smi
-
-    pd.DataFrame(g_smi).to_csv(path,index=0)    
-
-
-
-def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
+def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./',target='akt1'):
     
 
     relation = RELATION()
@@ -66,7 +74,7 @@ def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
     np.random.seed(random_seed)
     
     X = np.loadtxt('./data/bo/latent_points.npz')['arr_0']
-    y = -np.loadtxt('./data/bo/docking_scores.npz')['akt1']
+    y = -np.loadtxt('./data/bo/docking_scores.npz')[target]
     y = y.reshape((-1, 1))
 
     n = X.shape[0]
@@ -131,18 +139,18 @@ def main_bo(n_sampled=500,iterations=5,random_seed=1,path='./'):
         iteration += 1
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--num", type=int, required=True)
-    parser.add_argument("-o","--output", type=str, required=True,help='output directory')
-    parser.add_argument("-i","--iter", type=int, required=False,help='the path of pkis')
-    parser.add_argument("-m","--method", type=str, required=False,help='mode: 1 for source data; 0 for target data')
-    args = parser.parse_args()
-    #get_3d_grid(input=args.input,output=args.output,pki_path=args.pkidir,mode=args.mode)
 
 
-    if args.method == 'bo':
-        main_bo(n_sampled=args.num,iterations=args.iter,random_seed=1, path=args.output)
-    else:
-        greed_search(n_sampled=args.num, path=args.output)
+
+
+
+if __name__ == '__main__':
+
     
+
+    if args.method == 1:
+        main_bo(n_sampled=args.numbers,iterations=args.iter,random_seed=1, path=args.path,target=args.target)
+    else:
+        gen_smi(n_sample=args.numbers,path=args.path,max_len=args.max_length,target=args.target)
+
+
