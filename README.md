@@ -42,7 +42,11 @@ To train the RELATION network, the source dataset and target dataset (akt1 and c
 ### Training RELATION
 Load sourch dataset (`./data/zinc/zinc.npz`) and target dataset (`./data/akt1/akt_pkis.npz`or `./data/cdk2/cdk2_pkis.npz`).
 
-`python model/train.py`
+`python model/train.py --epoches 150
+                       --steps 5000
+                       --target akt1
+                       --batchsize 256
+                       --decive 0`
 
 
 
@@ -52,15 +56,17 @@ Load sourch dataset (`./data/zinc/zinc.npz`) and target dataset (`./data/akt1/ak
 Load the `./akt1_relation.pth` or `./cdk2_relation.pth` generative model, and typing the following codes:
 
 
-`python sample.py --num 500
-                  --output ./gen_smi.csv`
+`python sample.py --method 0
+                  --numbers 500
+                  --output ./output
+                  --target akt1`
 
 or you can also use the bayesian optimization in sampling process:
 
-`python sample.py --num 500
-                  --output ./gen_smi.csv
-                  --method bo
-                  --iter 5`
+`python sample.py --method 1
+                  --numbers 500
+                  --output ./output
+                  --target akt1`
 
 
 
