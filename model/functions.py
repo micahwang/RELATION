@@ -9,9 +9,10 @@ class LatentLoss(nn.Module):
         super(LatentLoss, self).__init__()
 
     def forward(self, mu, logvar):
-        KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
-        latentLoss = torch.sum(KLD_element).mul_(-0.5)
-        return latentLoss
+        kl_loss = 0.5 * (logvar.exp() + mu ** 2 - 1 - logvar).sum(1).mean()
+
+
+        return kl_loss
 
 
 
@@ -35,7 +36,7 @@ class SIMSE(nn.Module):
         super(SIMSE, self).__init__()
 
     def forward(self, re_x, x):
-        diffs = torch.add(x, - re_x)
+        diffs = torch.add(x, -re_x)
         n = torch.numel(diffs.data)
         simse = torch.sum(diffs).pow(2) / (n ** 2)
 
